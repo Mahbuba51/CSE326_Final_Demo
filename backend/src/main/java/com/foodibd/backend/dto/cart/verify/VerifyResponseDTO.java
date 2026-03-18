@@ -1,4 +1,4 @@
-package com.foodibd.backend.dto.cart.clearCart;
+package com.foodibd.backend.dto.cart.verify;
 
 import lombok.*;
 
@@ -6,7 +6,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ClearCartResponseDTO {
+public class VerifyResponseDTO {
 
     private String message;
 }
