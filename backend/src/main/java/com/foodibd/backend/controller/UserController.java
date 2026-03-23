@@ -1,8 +1,6 @@
 package com.foodibd.backend.controller;
 
 import com.foodibd.backend.dto.user.AddressResponseDTO;
-
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,13 +8,19 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/users")
 public class UserController {
 
-    //get default address
     @GetMapping("/addresses/default")
     public ResponseEntity<AddressResponseDTO> getDefaultAddress(
             @RequestHeader("Authorization") String authorizationHeader) {
 
-        // TODO: call service layer
-        return ResponseEntity.ok().build();
-    }
+        // Demo default address — no auth/user system implemented yet
+        AddressResponseDTO address = AddressResponseDTO.builder()
+                .street("12 Gulshan Avenue")
+                .city("Dhaka")
+                .state("Dhaka Division")
+                .postalCode("1212")
+                .country("Bangladesh")
+                .build();
 
+        return ResponseEntity.ok(address);
+    }
 }

@@ -1,0 +1,715 @@
+CSE326_FINAL_DEMO/
+└── backend/
+    ├── .mvn/
+    ├── src/
+    │   └── main/
+    │       ├── java/
+    │       │   └── com/
+    │       │       └── foodibd/
+    │       │           └── backend/
+    │       │
+    │       │               ├── config/
+    │       │               │   └── CorsConfig.java
+    │       │
+    │       │               ├── controller/
+    │       │               │   ├── CartController.java
+    │       │               │   ├── RestaurantController.java
+    │       │               │   └── UserController.java
+    │       │
+    │       │               ├── dto/
+    │       │               │   ├── cart/
+    │       │               │   │   ├── bill/
+    │       │               │   │   │   ├── BillRequestDTO.java
+    │       │               │   │   │   └── BillResponseDTO.java
+    │       │               │   │   │
+    │       │               │   │   ├── verify/
+    │       │               │   │   │   ├── VerifyRequestDTO.java
+    │       │               │   │   │   └── VerifyResponseDTO.java
+    │       │               │   │   │
+    │       │               │   │   ├── promo/
+    │       │               │   │   │   ├── PromoRequestDTO.java
+    │       │               │   │   │   └── PromoResponseDTO.java
+    │       │               │   │   │
+    │       │               │   │   └── item/
+    │       │               │   │       └── CartItemDTO.java
+    |       |               |   |       └── CartItemCustomizationDTO.java 
+    │       │               │   ├── menu/
+    │       │               │   ├── restaurant/
+    │       │               │   └── user/
+    │       │               │       └── AddressResponseDTO.java
+    │       │
+    │       │               ├── entity/
+    │       │               │   ├── embedded/
+    │       │               │   │   └── Address.java
+    │       │               │   │
+    │       │               │   ├── enums/
+    │       │               │   │
+    │       │               │   ├── Customer.java
+    │       │               │   ├── Menu.java
+    │       │               │   ├── MenuItem.java
+    │       │               │   ├── Order.java
+    │       │               │   ├── OrderItem.java
+    │       │               │   └── Restaurant.java
+    │       │
+    │       │               ├── repository/
+    │       │               │   ├── CustomerRepository.java
+    │       │               │   ├── MenuRepository.java
+    │       │               │   ├── MenuItemRepository.java
+    │       │               │   ├── OrderRepository.java
+    │       │               │   ├── OrderItemRepository.java
+    │       │               │   └── RestaurantRepository.java
+    │       │
+    │       │               └── (❌ MISSING)
+    │       │                   service/   ← YOU must create
+    │       │                   DataSeeder.java ← YOU must create
+    │
+    │       └── resources/
+    │           └── application.yaml
+    │
+    └── Dockerfile 
+|__frontend
+|__dockercomposefile
+|__commands.md
+
+//CartController
+package com.foodibd.backend.controller;
+
+import com.foodibd.backend.dto.cart.promo.PromoRequestDTO;
+import com.foodibd.backend.dto.cart.promo.PromoResponseDTO;
+
+import com.foodibd.backend.dto.cart.verify.VerifyRequestDTO;
+import com.foodibd.backend.dto.cart.verify.VerifyResponseDTO;
+
+import com.foodibd.backend.dto.cart.bill.BillRequestDTO;
+import com.foodibd.backend.dto.cart.bill.BillResponseDTO;
+
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/cart")
+public class CartController {
+
+    //promo
+    @PostMapping("/promo")
+    public ResponseEntity<PromoResponseDTO> validatePromo(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestBody PromoRequestDTO request) {
+
+        // TODO: call service layer
+        return ResponseEntity.ok().build();
+    }
+
+    // bill
+    @PostMapping("/bill")
+    public ResponseEntity<BillResponseDTO> generateBill(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestBody BillRequestDTO request) {
+
+        // TODO: call service layer
+        return ResponseEntity.ok().build();
+    }
+        //get cart item details by cart item id
+    @PostMapping("/verify")
+    public ResponseEntity<VerifyResponseDTO> verify(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestBody  VerifyRequestDTO request) {
+
+        // TODO: call service layer
+        return ResponseEntity.ok().build();
+    }
+
+}
+//RestaurantController
+package com.foodibd.backend.controller;
+
+import com.foodibd.backend.dto.restaurant.getRestaurantDetails.RestaurantDetailsResponseDTO;
+import com.foodibd.backend.dto.menu.getRestaurantMenu.MenuResponseDTO;
+import com.foodibd.backend.dto.menu.getMenuItemDetails.MenuItemDetailsResponseDTO;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/restaurants")
+public class RestaurantController {
+
+    @GetMapping("/{restaurant_id}")
+    public ResponseEntity<RestaurantDetailsResponseDTO> getRestaurantDetails(
+            @PathVariable("restaurant_id") Integer restaurantId) {
+
+        // TODO: call service layer
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{restaurant_id}/menu")
+    public ResponseEntity<MenuResponseDTO> getRestaurantMenu(
+            @PathVariable("restaurant_id") Integer restaurantId,
+            @RequestParam(value = "query", required = false) String query) {
+
+        // TODO: call service layer
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{restaurant_id}/menu/items/{item_id}")
+    public ResponseEntity<MenuItemDetailsResponseDTO> getMenuItemDetails(
+            @PathVariable("restaurant_id") Integer restaurantId,
+            @PathVariable("item_id") Integer itemId) {
+
+        // TODO: call service layer
+        return ResponseEntity.ok().build();
+    }
+}
+//UserController
+package com.foodibd.backend.controller;
+
+import com.foodibd.backend.dto.user.AddressResponseDTO;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/users")
+public class UserController {
+
+    //get default address
+    @GetMapping("/addresses/default")
+    public ResponseEntity<AddressResponseDTO> getDefaultAddress(
+            @RequestHeader("Authorization") String authorizationHeader) {
+
+        // TODO: call service layer
+        return ResponseEntity.ok().build();
+    }
+
+}
+
+//BillRequestDTO
+package com.foodibd.backend.dto.cart.bill;
+
+import lombok.*;
+import java.util.List;
+import com.foodibd.backend.dto.cart.item.CartItemDTO;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class BillRequestDTO {
+
+    private Integer restaurant_id;
+    private List<CartItemDTO> items;
+    private String promo_code;
+
+}
+//BillResponseDTO
+package com.foodibd.backend.dto.cart.bill;
+
+import lombok.*;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class BillResponseDTO {
+
+    private Integer restaurant_id;
+
+    private Integer subtotal;
+    private Integer discount;
+    private Integer delivery_fee;
+    private Integer total;
+
+    private Boolean promo_applied;
+    private String message;
+
+}
+//CartItemCustomizationDTO
+package com.foodibd.backend.dto.cart.item;
+
+import lombok.*;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class CartItemCustomizationDTO {
+
+    private Integer customization_id;
+    private Integer option_id;
+}
+
+
+//CartItemDTO
+package com.foodibd.backend.dto.cart.item;
+
+
+import com.foodibd.backend.dto.cart.item.CartItemCustomizationDTO;
+
+import java.util.List;
+
+import lombok.*;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class CartItemDTO {
+
+        private Integer item_id;
+        private Integer quantity;
+        private List<CartItemCustomizationDTO> customizations;
+        private List<Integer> addon_ids;
+        private String special_instructions;
+}
+//PromoRequestDTO
+package com.foodibd.backend.dto.cart.promo;
+
+import lombok.*;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class PromoRequestDTO {
+
+    private String promo_code;
+    private Integer restaurant_id;
+    private Integer subtotal;
+    private Integer delivery_fee;
+}
+
+//PromoResponseDTO
+package com.foodibd.backend.dto.cart.promo;
+
+import lombok.*;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class PromoResponseDTO {
+
+    private String promo_code;
+    private Boolean is_valid;
+    private String discount_type;   // "flat" or "percentage"
+    private Integer discount_value;
+    private Integer discount_amount;
+    private Integer sub_total;
+    private Integer total;
+    private Integer delivery_fee;
+    private String message;
+}
+//VerifyRequestDTO
+package com.foodibd.backend.dto.cart.verify;
+
+import lombok.*;
+import java.util.List;
+import com.foodibd.backend.dto.cart.item.CartItemDTO;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class VerifyRequestDTO {
+
+    private Integer restaurant_id;
+    private List<CartItemDTO> items;
+    private String promo_code;
+
+}
+//VerifyResponseDTO
+package com.foodibd.backend.dto.cart.verify;
+
+import lombok.*;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class VerifyResponseDTO {
+
+    private String message;
+}
+//AddressResponseDTO
+package com.foodibd.backend.dto.user;
+
+public class AddressResponseDTO {
+    //TODO
+}
+
+////entity
+//Customer
+package com.foodibd.backend.entity;
+
+import com.foodibd.backend.entity.embedded.Address;
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Table(name = "customers")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Customer {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer customerID;
+
+    private String name;
+
+    @Column(unique = true)
+    private String email;
+
+    private String phoneNumber;
+
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "street",     column = @Column(name = "address_street")),
+        @AttributeOverride(name = "city",       column = @Column(name = "address_city")),
+        @AttributeOverride(name = "state",      column = @Column(name = "address_state")),
+        @AttributeOverride(name = "postalCode", column = @Column(name = "address_postal_code")),
+        @AttributeOverride(name = "country",    column = @Column(name = "address_country"))
+    })
+    private Address address;
+}
+//Menu
+package com.foodibd.backend.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+import java.util.List;
+
+@Entity
+@Table(name = "menus")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Menu {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer menuID;
+
+    @OneToOne
+    @JoinColumn(name = "restaurant_id")
+    private Restaurant restaurant;
+
+    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<MenuItem> items;
+
+    // --- Recursive relation ---
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_menu_id")
+    private Menu parentMenu;
+
+    @OneToMany(mappedBy = "parentMenu", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Menu> subMenus;
+}
+//MenuItem
+package com.foodibd.backend.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+import java.util.List;
+
+@Entity
+@Table(name = "menu_items")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class MenuItem {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer itemId;
+
+    private String name;
+    private String description;
+    private Double price;
+    private Boolean availability;
+
+    @ElementCollection
+    @CollectionTable(name = "menu_item_categories", joinColumns = @JoinColumn(name = "item_id"))
+    @Column(name = "category")
+    private List<String> categories;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "menu_id")
+    private Menu menu;
+}
+//Order
+package com.foodibd.backend.entity;
+
+import com.foodibd.backend.entity.embedded.Address;
+import com.foodibd.backend.entity.enums.OrderStatus;
+import com.foodibd.backend.entity.enums.PaymentOption;
+import jakarta.persistence.*;
+import lombok.*;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Entity
+@Table(name = "orders")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Order {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer orderID;
+
+    private Integer cartID;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<OrderItem> items;
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+
+    private Boolean paymentStatus;
+
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "street",     column = @Column(name = "delivery_street")),
+        @AttributeOverride(name = "city",       column = @Column(name = "delivery_city")),
+        @AttributeOverride(name = "state",      column = @Column(name = "delivery_state")),
+        @AttributeOverride(name = "postalCode", column = @Column(name = "delivery_postal_code")),
+        @AttributeOverride(name = "country",    column = @Column(name = "delivery_country"))
+    })
+    private Address deliveryAddress;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime estimatedDeliveryTime;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentOption paymentOption;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "restaurant_id")
+    private Restaurant restaurant;
+}
+//OrderItem
+package com.foodibd.backend.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Table(name = "order_items")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class OrderItem {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer orderItemID;
+
+    private Integer quantity;
+    private Double priceAtPurchase;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "menu_item_id")
+    private MenuItem menuItem;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order;
+
+    public Double calculatePrice() {
+        return priceAtPurchase * quantity;
+    }
+}
+//Restaurant
+package com.foodibd.backend.entity;
+
+import com.foodibd.backend.entity.embedded.Address;
+import jakarta.persistence.*;
+import lombok.*;
+import java.util.List;
+
+@Entity
+@Table(name = "restaurants")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Restaurant {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer restaurantID;
+
+    private String name;
+
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "street",     column = @Column(name = "address_street")),
+        @AttributeOverride(name = "city",       column = @Column(name = "address_city")),
+        @AttributeOverride(name = "state",      column = @Column(name = "address_state")),
+        @AttributeOverride(name = "postalCode", column = @Column(name = "address_postal_code")),
+        @AttributeOverride(name = "country",    column = @Column(name = "address_country"))
+    })
+    private Address address;
+
+    @ElementCollection
+    @CollectionTable(name = "restaurant_cuisine_types", joinColumns = @JoinColumn(name = "restaurant_id"))
+    @Column(name = "cuisine_type")
+    private List<String> cuisineTypes;
+
+    @OneToOne(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Menu menu;
+
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Order> orders;
+
+    private Double rating;
+    private Boolean available;
+}
+
+////repository
+//CustomerRepository
+package com.foodibd.backend.repository;
+
+import com.foodibd.backend.entity.Customer;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
+
+public interface CustomerRepository extends JpaRepository<Customer, Integer> {
+    Optional<Customer> findByEmail(String email);
+}
+//MenuItemRepository
+package com.foodibd.backend.repository;
+
+import com.foodibd.backend.entity.MenuItem;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
+
+public interface MenuItemRepository extends JpaRepository<MenuItem, Integer> {
+    List<MenuItem> findByMenuMenuID(Integer menuId);
+    List<MenuItem> findByAvailabilityTrue();
+}
+//MenuRepository
+package com.foodibd.backend.repository;
+
+import com.foodibd.backend.entity.Menu;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
+
+public interface MenuRepository extends JpaRepository<Menu, Integer> {
+    Optional<Menu> findByRestaurantRestaurantID(Integer restaurantId);
+}
+//OrderItemRepository
+package com.foodibd.backend.repository;
+
+import com.foodibd.backend.entity.OrderItem;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
+
+public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
+    List<OrderItem> findByOrderOrderID(Integer orderId);
+}
+//OrderRepository
+package com.foodibd.backend.repository;
+
+import com.foodibd.backend.entity.Order;
+import com.foodibd.backend.entity.enums.OrderStatus;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
+
+public interface OrderRepository extends JpaRepository<Order, Integer> {
+    List<Order> findByCustomerCustomerID(Integer customerId);
+    List<Order> findByRestaurantRestaurantID(Integer restaurantId);
+    List<Order> findByStatus(OrderStatus status);
+}
+//RestaurantRepository
+package com.foodibd.backend.repository;
+
+import com.foodibd.backend.entity.Restaurant;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
+
+public interface RestaurantRepository extends JpaRepository<Restaurant, Integer> {
+    List<Restaurant> findByNameContainingIgnoreCase(String name);
+    List<Restaurant> findByAvailableTrue();
+}
+
+//application.yaml
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/foodorder}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+//Dockerfile
+FROM maven:3.9-eclipse-temurin-21 AS build
+WORKDIR /app
+COPY pom.xml .
+RUN mvn dependency:go-offline
+COPY src ./src
+RUN mvn package -DskipTests
+
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+//dockercomposefile(outside the )
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: foodorder
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/foodorder
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "4173:4173"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
