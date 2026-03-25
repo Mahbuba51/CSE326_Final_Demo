@@ -2,49 +2,40 @@ package com.foodibd.backend.controller;
 
 import com.foodibd.backend.dto.cart.promo.PromoRequestDTO;
 import com.foodibd.backend.dto.cart.promo.PromoResponseDTO;
-
 import com.foodibd.backend.dto.cart.verify.VerifyRequestDTO;
 import com.foodibd.backend.dto.cart.verify.VerifyResponseDTO;
-
 import com.foodibd.backend.dto.cart.bill.BillRequestDTO;
 import com.foodibd.backend.dto.cart.bill.BillResponseDTO;
-
-
-import org.springframework.http.HttpStatus;
+import com.foodibd.backend.service.CartService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/cart")
+@RequestMapping("/api/cart")
+@RequiredArgsConstructor
 public class CartController {
 
-    //promo
+    private final CartService cartService;
+
     @PostMapping("/promo")
     public ResponseEntity<PromoResponseDTO> validatePromo(
-            @RequestHeader("Authorization") String authorizationHeader,
             @RequestBody PromoRequestDTO request) {
 
-        // TODO: call service layer
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(cartService.validatePromo(request));
     }
 
-    // bill
     @PostMapping("/bill")
     public ResponseEntity<BillResponseDTO> generateBill(
-            @RequestHeader("Authorization") String authorizationHeader,
             @RequestBody BillRequestDTO request) {
 
-        // TODO: call service layer
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(cartService.generateBill(request));
     }
-        //get cart item details by cart item id
+
     @PostMapping("/verify")
     public ResponseEntity<VerifyResponseDTO> verify(
-            @RequestHeader("Authorization") String authorizationHeader,
-            @RequestBody  VerifyRequestDTO request) {
+            @RequestBody VerifyRequestDTO request) {
 
-        // TODO: call service layer
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(cartService.verify(request));
     }
-
 }
