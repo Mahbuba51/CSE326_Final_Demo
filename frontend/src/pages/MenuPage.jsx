@@ -10,8 +10,9 @@ export default function MenuPage() {
   const [menuItems, setMenuItems] = useState([]);
   const [activeCategory, setActiveCategory] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
-  const [loadingItemId, setLoadingItemId] = useState(null); // tracks which button is loading
+  const [loadingItemId, setLoadingItemId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const { totalItems } = useCart();
   const navigate = useNavigate();
 
@@ -28,8 +29,22 @@ export default function MenuPage() {
     load();
   }, []);
 
+  // ── Search filtering ───────────────────────────────────────────────────────
+  const isSearching = searchQuery.trim().length > 0;
+  const q = searchQuery.toLowerCase().trim();
+
+  const filteredItems = isSearching
+    ? menuItems.filter(
+        (item) =>
+          item.name.toLowerCase().includes(q) ||
+          item.description.toLowerCase().includes(q) ||
+          item.category.toLowerCase().includes(q)
+      )
+    : menuItems;
+
   const categories = [...new Set(menuItems.map((i) => i.category))];
 
+  // ── Sticky tab scroll tracking (only when not searching) ──────────────────
   useEffect(() => {
     if (categories.length > 0 && !activeCategory) {
       setActiveCategory(categories[0]);
@@ -37,6 +52,7 @@ export default function MenuPage() {
   }, [categories]);
 
   useEffect(() => {
+    if (isSearching) return;
     const handleScroll = () => {
       for (const cat of categories) {
         const el = sectionRefs.current[cat];
@@ -51,7 +67,7 @@ export default function MenuPage() {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [categories]);
+  }, [categories, isSearching]);
 
   const scrollToCategory = (cat) => {
     setActiveCategory(cat);
@@ -67,14 +83,13 @@ export default function MenuPage() {
     }
   };
 
-  // Fetch full item details (including addons) before opening modal
+  // ── Open modal with full item details ─────────────────────────────────────
   const handleAddToCart = async (item) => {
     setLoadingItemId(item.id);
     try {
       const fullItem = await getMenuItemById(item.id);
       setSelectedItem(fullItem);
-    } catch (e) {
-      // Fallback to summary item if fetch fails
+    } catch {
       setSelectedItem(item);
     } finally {
       setLoadingItemId(null);
@@ -85,6 +100,7 @@ export default function MenuPage() {
 
   return (
     <div className="menu-page">
+      {/* Hero */}
       <div className="menu-hero">
         <button className="back-btn" onClick={() => navigate(-1)}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -106,6 +122,7 @@ export default function MenuPage() {
         </button>
       </div>
 
+      {/* Restaurant info */}
       <div className="restaurant-info">
         <h1>{restaurant?.name}</h1>
         <p className="cat-label">{restaurant?.category}</p>
@@ -120,28 +137,79 @@ export default function MenuPage() {
         </div>
       </div>
 
+      {/* Search */}
       <div className="search-wrap">
         <svg className="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#aaa" strokeWidth="2">
           <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
         </svg>
-        <input placeholder="Search in menu..." className="search-input" />
+        <input
+          placeholder="Search in menu..."
+          className="search-input"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        {isSearching && (
+          <button className="search-clear" onClick={() => setSearchQuery("")}>✕</button>
+        )}
       </div>
 
-      <div className="category-tabs sticky-tabs" ref={tabsRef}>
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            data-cat={cat}
-            className={`cat-tab ${activeCategory === cat ? "active" : ""}`}
-            onClick={() => scrollToCategory(cat)}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
+      {/* Category tabs — hidden while searching */}
+      {!isSearching && (
+        <div className="category-tabs sticky-tabs" ref={tabsRef}>
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              data-cat={cat}
+              className={`cat-tab ${activeCategory === cat ? "active" : ""}`}
+              onClick={() => scrollToCategory(cat)}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      )}
 
+      {/* Menu list */}
       <div className="menu-list">
-        {categories.map((cat) => (
+
+        {/* Search results view */}
+        {isSearching && (
+          <>
+            <p className="search-results-label">
+              {filteredItems.length === 0
+                ? `No items found for "${searchQuery}"`
+                : `${filteredItems.length} result${filteredItems.length !== 1 ? "s" : ""} for "${searchQuery}"`}
+            </p>
+            {filteredItems.map((item) => (
+              <div key={item.id} className="menu-card">
+                <div className="menu-card-content">
+                  <img src={item.image} alt={item.name} className="menu-item-img" />
+                  <div className="menu-item-info">
+                    <div className="item-name-row">
+                      <span className="item-name">{item.name}</span>
+                      {item.isPopular && <span className="popular-badge">🔥 Popular</span>}
+                    </div>
+                    <p className="item-desc">{item.description}</p>
+                    <div className="item-price-row">
+                      <span className="item-category-tag">{item.category}</span>
+                      <span className="item-price">৳{item.displayPrice}</span>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  className="add-cart-btn"
+                  onClick={() => handleAddToCart(item)}
+                  disabled={loadingItemId === item.id}
+                >
+                  {loadingItemId === item.id ? "Loading..." : "Add to Cart"}
+                </button>
+              </div>
+            ))}
+          </>
+        )}
+
+        {/* Normal category view */}
+        {!isSearching && categories.map((cat) => (
           <div key={cat} ref={(el) => (sectionRefs.current[cat] = el)}>
             <h2 className="section-title">{cat}</h2>
             {menuItems
@@ -172,6 +240,7 @@ export default function MenuPage() {
         ))}
       </div>
 
+      {/* Bottom cart bar */}
       {totalItems > 0 && (
         <div className="bottom-cart-bar" onClick={() => navigate("/cart")}>
           <span className="bar-count">{totalItems} item{totalItems > 1 ? "s" : ""}</span>
@@ -182,6 +251,7 @@ export default function MenuPage() {
         </div>
       )}
 
+      {/* Item modal */}
       {selectedItem && (
         <ItemModal item={selectedItem} onClose={() => setSelectedItem(null)} />
       )}

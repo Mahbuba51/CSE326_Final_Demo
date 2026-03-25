@@ -1,7 +1,6 @@
-// Base URL — in Docker both containers are on the same host from the browser's perspective
 const API_BASE = "http://localhost:8080/api";
 
-const RESTAURANT_ID = 1; // Chillox - Lalbagh
+const RESTAURANT_ID = 1;
 const DELIVERY_FEE  = 50;
 
 // ─── Restaurant & Menu ────────────────────────────────────────────────────────
@@ -10,20 +9,18 @@ export const getRestaurant = async () => {
   const res = await fetch(`${API_BASE}/restaurants/${RESTAURANT_ID}`);
   if (!res.ok) throw new Error("Failed to fetch restaurant");
   const data = await res.json();
-
-  // Normalise backend DTO → shape the frontend already expects
   return {
-    id:               data.restaurantId,
-    name:             data.name,
-    category:         data.cuisineTags?.join(", ") ?? "",
-    rating:           data.rating,
-    reviews:          data.ratingCount,
-    distance:         `${data.distanceM} m`,
-    deliveryTime:     `${data.deliveryTimeMin}-${data.deliveryTimeMax} min`,
-    deliveryBy:       data.deliveredBy,
-    minOrder:         data.deliveryFee,
-    estimatedDelivery:`${data.deliveryTimeMin}-${data.deliveryTimeMax} mins`,
-    isOpen:           data.isOpen,
+    id:                data.restaurantId,
+    name:              data.name,
+    category:          data.cuisineTags?.join(", ") ?? "",
+    rating:            data.rating,
+    reviews:           data.ratingCount,
+    distance:          `${data.distanceM} m`,
+    deliveryTime:      `${data.deliveryTimeMin}-${data.deliveryTimeMax} min`,
+    deliveryBy:        data.deliveredBy,
+    minOrder:          data.deliveryFee,
+    estimatedDelivery: `${data.deliveryTimeMin}-${data.deliveryTimeMax} mins`,
+    isOpen:            data.isOpen,
   };
 };
 
@@ -31,8 +28,6 @@ export const getMenuItems = async () => {
   const res = await fetch(`${API_BASE}/restaurants/${RESTAURANT_ID}/menu`);
   if (!res.ok) throw new Error("Failed to fetch menu");
   const data = await res.json();
-
-  // Flatten categories → array of items, each with a `category` field
   const items = [];
   for (const cat of (data.categories ?? [])) {
     for (const item of (cat.items ?? [])) {
@@ -56,7 +51,6 @@ export const getMenuItemById = async (id) => {
   if (!res.ok) throw new Error("Failed to fetch menu item");
   const data = await res.json();
 
-  // Map customizations from backend DTO → shape ItemModal expects
   const customizations = {};
   for (const c of (data.customizations ?? [])) {
     const key = descriptionToKey(c.description);
@@ -67,7 +61,6 @@ export const getMenuItemById = async (id) => {
     }));
   }
 
-  // Addons become the "toppings" array ItemModal expects
   if (data.addons?.length) {
     customizations.toppings = data.addons.map(a => ({
       name:  a.name,
@@ -95,10 +88,10 @@ export const validatePromoCode = async (code, subtotal) => {
     method:  "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      promo_code:   code,
+      promo_code:    code,
       restaurant_id: RESTAURANT_ID,
       subtotal,
-      delivery_fee: DELIVERY_FEE,
+      delivery_fee:  DELIVERY_FEE,
     }),
   });
 
@@ -108,32 +101,18 @@ export const validatePromoCode = async (code, subtotal) => {
     throw new Error(data.message ?? "Invalid promo code");
   }
 
+  // Return type + value so CartContext can recalculate discount live
+  // backend returns discount_type as "percentage" or "flat"
   return {
-    discount: data.discount_amount,
-    label:    `${data.discount_value}${data.discount_type === "percentage" ? "%" : "৳"} off`,
+    type:  data.discount_type === "percentage" ? "percent" : "flat",
+    value: data.discount_value,  // 20 for FOOD20, 50 for WELCOME50
+    label: `${data.discount_value}${data.discount_type === "percentage" ? "%" : "৳"} off`,
   };
-};
-
-// ─── Bill ─────────────────────────────────────────────────────────────────────
-
-export const getBill = async (cartItems, promoCode) => {
-  const res = await fetch(`${API_BASE}/cart/bill`, {
-    method:  "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      restaurant_id: RESTAURANT_ID,
-      items:         cartItemsToDTO(cartItems),
-      promo_code:    promoCode ?? null,
-    }),
-  });
-  if (!res.ok) throw new Error("Failed to generate bill");
-  return res.json(); // BillResponseDTO
 };
 
 // ─── Order / Checkout ─────────────────────────────────────────────────────────
 
 export const placeOrder = async (cartItems, promoCode, total) => {
-  // Step 1: verify the cart is still valid
   const verifyRes = await fetch(`${API_BASE}/cart/verify`, {
     method:  "POST",
     headers: { "Content-Type": "application/json" },
@@ -149,19 +128,13 @@ export const placeOrder = async (cartItems, promoCode, total) => {
     return { success: false, message: verifyData.message };
   }
 
-  // Step 2: simulate order placement (no dedicated order endpoint yet)
+  // Simulate order placement
   console.log("Order placed:", { cartItems, promoCode, total });
   return { success: true, orderId: "ORD-" + Date.now() };
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/**
- * Convert frontend cart items → CartItemDTO array the backend expects.
- * addon_ids are not tracked in the frontend cart (only their names/prices
- * are stored), so we send an empty list — the bill/verify endpoints still
- * work correctly using the item price stored in the DB.
- */
 function cartItemsToDTO(cartItems) {
   return cartItems.map(item => ({
     item_id:              item.id,
@@ -172,11 +145,6 @@ function cartItemsToDTO(cartItems) {
   }));
 }
 
-/**
- * Convert a human-readable customization description from the backend
- * into the camelCase key that ItemModal uses.
- * e.g. "Choose Your Bun" → "bun", "Spice Level" → "spiceLevel", "Size" → "size"
- */
 function descriptionToKey(description) {
   const map = {
     "Choose Your Bun": "bun",

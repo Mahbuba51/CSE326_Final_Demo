@@ -9,7 +9,7 @@ export default function ItemModal({ item, onClose }) {
   const [toppings, setToppings] = useState([]);
   const [addedAnim, setAddedAnim] = useState(false);
 
-  // Pre-select first option for each group
+  // Pre-select first option for each customization group
   useEffect(() => {
     const defaults = {};
     Object.entries(item.customizations || {}).forEach(([key, options]) => {
@@ -34,35 +34,52 @@ export default function ItemModal({ item, onClose }) {
     return t ? t.price : 0;
   };
 
-  const extraCost = toppings.reduce((sum, name) => sum + getToppingPrice(name), 0);
+  // Extra cost from selected options (size, bun, spice, etc.)
+  const getSelectedOptionPrice = (key) => {
+    const options = item.customizations?.[key];
+    if (!options || key === "toppings") return 0;
+    const chosen = options.find((o) => o.name === selected[key]);
+    return chosen ? (chosen.price ?? 0) : 0;
+  };
+
+  const selectedExtraCost = Object.keys(selected).reduce(
+    (sum, key) => sum + getSelectedOptionPrice(key),
+    0
+  );
+
+  const toppingExtraCost = toppings.reduce(
+    (sum, name) => sum + getToppingPrice(name),
+    0
+  );
+
+  const extraCost  = selectedExtraCost + toppingExtraCost;
   const totalPrice = (item.price + extraCost) * quantity;
 
   const handleAdd = () => {
     const customizationSummary = Object.entries(selected)
-      .map(([k, v]) => v)
+      .map(([, v]) => v)
       .join(", ");
 
     addItem({
-      id: item.id,
-      name: item.name,
-      image: item.image,
-      price: item.price + extraCost,
+      id:                item.id,
+      name:              item.name,
+      image:             item.image,
+      price:             item.price + extraCost,
       quantity,
-      customizations: { ...selected, toppings },
+      customizations:    { ...selected, toppings },
       customizationLabel: [customizationSummary, ...toppings].filter(Boolean).join(", "),
-      restaurantName: "Chillox - Lalbagh",
+      restaurantName:    "Chillox - Lalbagh",
     });
 
     setAddedAnim(true);
-    setTimeout(() => {
-      onClose();
-    }, 400);
+    setTimeout(() => onClose(), 400);
   };
 
   return (
     <div className="modal-backdrop" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className={`modal-sheet ${addedAnim ? "modal-exit" : ""}`}>
-        {/* Header Image */}
+
+        {/* Header image */}
         <div className="modal-img-wrap">
           <img src={item.image} alt={item.name} />
           <button className="modal-close" onClick={onClose}>✕</button>
@@ -73,14 +90,14 @@ export default function ItemModal({ item, onClose }) {
           <p className="modal-from">From TK {item.price}</p>
           <p className="modal-desc">{item.fullDescription}</p>
 
-          {/* Customization Groups */}
+          {/* Customization groups (bun, spice, size, etc.) */}
           {Object.entries(item.customizations || {}).map(([key, options]) => {
             if (key === "toppings") return null;
             const isRequired = options.some((o) => o.required);
             const label =
-              key === "bun" ? "Choose Your Bun" :
+              key === "bun"        ? "Choose Your Bun" :
               key === "spiceLevel" ? "Spice Level" :
-              key === "size" ? "Size" : key;
+              key === "size"       ? "Size" : key;
 
             return (
               <div key={key} className="custom-group">
@@ -99,7 +116,9 @@ export default function ItemModal({ item, onClose }) {
                   >
                     <span className="option-name">{opt.name}</span>
                     <div className="option-right">
-                      <span className="option-price">{opt.price === 0 ? "Free" : `৳${opt.price}`}</span>
+                      <span className="option-price">
+                        {opt.price === 0 ? "Free" : `+৳${opt.price}`}
+                      </span>
                       <div className={`radio-btn ${selected[key] === opt.name ? "radio-active" : ""}`} />
                     </div>
                   </div>
@@ -108,7 +127,7 @@ export default function ItemModal({ item, onClose }) {
             );
           })}
 
-          {/* Toppings */}
+          {/* Toppings / addons */}
           {item.customizations?.toppings && (
             <div className="custom-group">
               <div className="group-header">
@@ -148,7 +167,10 @@ export default function ItemModal({ item, onClose }) {
             <span>{quantity}</span>
             <button onClick={() => setQuantity(quantity + 1)}>+</button>
           </div>
-          <button className={`add-to-cart-main ${addedAnim ? "btn-success" : ""}`} onClick={handleAdd}>
+          <button
+            className={`add-to-cart-main ${addedAnim ? "btn-success" : ""}`}
+            onClick={handleAdd}
+          >
             {addedAnim ? "Added! ✓" : `Add to cart - TK ${totalPrice}`}
           </button>
         </div>
