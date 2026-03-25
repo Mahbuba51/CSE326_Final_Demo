@@ -1,3 +1,17 @@
+TRUNCATE TABLE
+  order_items,
+  orders,
+  customization_options,
+  customizations,
+  addons,
+  menu_item_categories,
+  menu_items,
+  menus,
+  restaurant_cuisine_types,
+  customers,
+  restaurants
+RESTART IDENTITY CASCADE;
+
 -- ─── Restaurant ──────────────────────────────────────────────────────────────
 INSERT INTO restaurants (name, rating, available,
     address_street, address_city, address_state, address_postal_code, address_country)
